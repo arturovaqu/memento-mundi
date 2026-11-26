@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Caveat:wght@500;700&family=Space+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@font-face {
+  font-family: "Brasika Display - Trial";
+  /* Copia con á é í ó ú ü ñ (y mayúsculas) montadas sobre la Brasika Trial, que no las trae. */
+  src: url("/fonts/brasika-display-es-v3.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Briska";
+  src: url("/fonts/brasika-display-es-v3.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --background: #eae7da;
+  --foreground: #0b2130;
+  --card: #fffdf6;
+  --card-foreground: #0b2130;
+  --primary: #fa9223;
+  --primary-foreground: #0b2130;
+  --border: #0b2130;
+  --ring: #fa9223;
+  --radius: 1.25rem;
+}
+
+@theme inline {
+  --color-cream: #eae7da;
+  --color-ink: #0b2130;
+  --color-orange: #fa9223;
+  --color-card: var(--card);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Cormorant Garamond", Georgia, serif;
+  --font-display: "Brasika Display - Trial", "Briska", "Cormorant Garamond", Georgia, serif;
+  --font-brand: "Brasika Display - Trial", Georgia, serif;
+  --font-mono: "Cormorant Garamond", Georgia, serif;
+  --shadow-hard: 5px 5px 0 #0b2130;
+  --shadow-hard-sm: 3px 3px 0 #0b2130;
+}
+
+* { box-sizing: border-box; font-synthesis: none; }
+html { scroll-behavior: smooth; }
+html, body { overflow-x: clip; }
+body { margin: 0; min-width: 320px; background: var(--background); color: var(--foreground); font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; font-synthesis: none; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3, h4, h5, h6 { font-family: "Brasika Display - Trial", "Briska", "Cormorant Garamond", Georgia, serif !important; font-weight: 400 !important; font-synthesis: none !important; overflow-wrap: anywhere; }
+h1 { font-size: clamp(2.8rem, 8vw, 7rem) !important; line-height: .94; }
+h2 { font-size: clamp(2rem, 5vw, 4.5rem) !important; line-height: .98; }
+h3 { font-size: clamp(1.6rem, 3.8vw, 3.25rem) !important; line-height: 1; }
+h4 { font-size: clamp(1.35rem, 3vw, 2.25rem) !important; line-height: 1.04; }
+h5 { font-size: clamp(1.15rem, 2.4vw, 1.75rem) !important; line-height: 1.08; }
+h6 { font-size: clamp(1rem, 2vw, 1.35rem) !important; line-height: 1.12; }
+.font-display { font-family: "Brasika Display - Trial", "Briska", "Cormorant Garamond", Georgia, serif !important; font-weight: 400 !important; font-synthesis: none !important; line-height: 1.02; letter-spacing: -.01em; }
+.font-brand { font-family: "Brasika Display - Trial", Georgia, serif !important; font-weight: 400 !important; font-synthesis: none !important; }
+.font-mono { font-family: "Cormorant Garamond", Georgia, serif !important; font-weight: 500 !important; font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; }
+button, input, textarea, select { font-family: "Cormorant Garamond", Georgia, serif; font-synthesis: none; }
+small, label, [class*="text-[9px]"], [class*="text-[10px]"], [class*="text-xs"] { line-height: 1.2; }
+body::before { content: ""; pointer-events: none; position: fixed; inset: 0; z-index: 60; opacity: .075; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
+button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* Comportamiento táctil de app nativa (sobre todo instalada como PWA):
+   sin destello al tocar, sin rebote elástico de la página y sin menú/selección accidental en la interfaz.
+   El texto de contenido (posts, comentarios, bios) y las fotos siguen siendo seleccionables/guardables. */
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { overscroll-behavior-y: none; }
+button, a, nav, header, label, summary, [role="button"], [role="tab"], [role="menuitem"], .dock-item, img[alt=""], .mascot-img, svg {
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+}
+input, textarea, select, [contenteditable]:not([contenteditable="false"]) {
+  -webkit-touch-callout: default; -webkit-user-select: text; user-select: text;
+}
+button:focus-visible, a:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.sticker-button { position: relative; overflow: hidden; }
+.sticker-button::after { content: ""; position: absolute; right: -2px; top: -2px; width: 18px; height: 18px; background: var(--background); border-left: 2px solid var(--foreground); border-bottom: 2px solid var(--foreground); transform: translate(9px, -9px) rotate(45deg); transition: transform .18s cubic-bezier(.23,1,.32,1); }
+.sticker-button:hover::after { transform: translate(2px, -2px) rotate(45deg); }
+/* Mapa del atlas (Leaflet): contexto de apilado propio para que sus capas no tapen el dock ni los modales,
+   y un velo suave sobre las teselas para acercarlas a la paleta crema de la marca. */
+.atlas-map { isolation: isolate; z-index: 0; background: #cbd8d2; font-family: inherit; }
+.atlas-map .leaflet-tile-pane { filter: sepia(.2) saturate(.8) contrast(.96) brightness(1.03); }
+.atlas-map .atlas-pin { background: transparent; border: 0; }
+.atlas-map .leaflet-control-attribution { background: rgba(234,231,218,.9); color: #0B2130; font-size: 10px; font-weight: 700; border-top-left-radius: 8px; padding: 2px 8px; }
+.atlas-map .leaflet-control-attribution a { color: #0B2130; text-decoration: underline; }
+.atlas-map .leaflet-marker-icon:focus-visible button { outline: 3px solid #FA9223; outline-offset: 4px; }
+/* Mascota: tamaño fijo por breakpoint, sin sombras ni brillos (acabado mate de pegatina). */
+.mascot-img { width: var(--mascot-size-mobile); }
+@media (min-width: 640px) { .mascot-img { width: var(--mascot-size); } }
+.dock-item { transition: transform .16s cubic-bezier(.23,1,.32,1), background-color .16s ease; }
+.dock-item:active { transform: scale(.94); }
+.editor-tool { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 5px; border: 2px solid transparent; border-radius: 14px; padding: 9px 3px; color: rgba(234,231,218,.65); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; transition: all .16s cubic-bezier(.23,1,.32,1); }
+.editor-tool:hover, .editor-tool.active { border-color: #EAE7DA; background: #FA9223; color: #0B2130; transform: translateY(-2px); }
+.editor-label { margin-bottom: 10px; color: #FA9223; font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+.editor-action { display: flex; align-items: center; justify-content: center; gap: 5px; border: 2px solid rgba(234,231,218,.2); border-radius: 10px; padding: 9px 4px; color: rgba(234,231,218,.8); font-size: 10px; font-weight: 900; transition: all .16s ease; }
+.mm-range { -webkit-appearance: none; appearance: none; height: 28px; background: transparent; accent-color: #FA9223; cursor: pointer; touch-action: pan-y; }
+.mm-range::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: rgba(234,231,218,.25); }
+.mm-range::-moz-range-track { height: 6px; border-radius: 999px; background: rgba(234,231,218,.25); }
+.mm-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -9px; width: 24px; height: 24px; border-radius: 999px; border: 2px solid #0B2130; background: #FA9223; box-shadow: 2px 2px 0 #EAE7DA; }
+.mm-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 999px; border: 2px solid #0B2130; background: #FA9223; box-shadow: 2px 2px 0 #EAE7DA; }
+.mm-range:focus-visible { outline: 3px solid #FA9223; outline-offset: 2px; border-radius: 8px; }
+.editor-action:hover { border-color: #FA9223; background: rgba(250,146,35,.15); color: #EAE7DA; }
+@media (max-width: 480px) { h1 { font-size: clamp(2.65rem, 15vw, 4.4rem) !important; } h2 { font-size: clamp(1.9rem, 10vw, 3.25rem) !important; } h3 { font-size: clamp(1.45rem, 8vw, 2.4rem) !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+/* Preferencia "Reducir animaciones" del perfil (misma regla, activada por clase). */
+html.reduce-motion, html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sticker-scroll-layer { transition: none !important; }
+}
+

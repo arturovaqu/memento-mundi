@@ -1,0 +1,249 @@
+import { useMemo, useState } from "react";
+import { ArrowRight, Instagram, Package, ShoppingBag, UserRound, X } from "lucide-react";
+import { useLocation } from "wouter";
+import { useAppAuth } from "@/hooks/useAppAuth";
+import StickerScrollHero from "@/components/StickerScrollHero";
+import CharacterGuide from "@/components/CharacterGuide";
+import Mascot from "@/components/ui/Mascot";
+import PageHero from "@/components/home/PageHero";
+import PaisajePhoto from "@/components/home/PaisajePhoto";
+import PhotoMosaic from "@/components/home/PhotoMosaic";
+import { PAISAJES, type Paisaje } from "@/lib/paisajes";
+
+type ProductKind = "sticker" | "keyring" | "magnet" | "ornament" | "wall";
+type Pack = { id: string; name: string; kicker: string; description: string; price: string; badge?: string; color: string; photo: Paisaje; items: string[]; featured?: boolean };
+
+const products: Record<ProductKind, { label: string; icon: string }> = {
+  sticker: { label: "Pegatina NFC + QR", icon: "✦" },
+  keyring: { label: "Llavero de destino", icon: "⌁" },
+  magnet: { label: "Imán de nevera", icon: "✺" },
+  ornament: { label: "Bola de Navidad", icon: "✧" },
+  wall: { label: "Cuadro pieza de ciudad", icon: "▦" },
+};
+
+const packs: Pack[] = [
+  { id: "sticker", name: "Pack Pegatinas", kicker: "El punto de partida", description: "Una pegatina NFC + QR para desbloquear tu scrapbook al instante.", price: "12 €", badge: "Más fácil", color: "bg-[#d8e2dc]", photo: PAISAJES.bratislavaPuerta, items: ["sticker"] },
+  { id: "duo", name: "Pack Viaje", kicker: "Para llevar contigo", description: "Pegatina + llavero para que tu destino vaya siempre en tu mochila.", price: "24 €", color: "bg-[#e7d8c2]", photo: PAISAJES.panama, items: ["sticker", "keyring"] },
+  { id: "home", name: "Pack Vuelta a casa", kicker: "Tu recuerdo diario", description: "Pegatina + imán para convertir la nevera en tu pequeño atlas.", price: "26 €", color: "bg-[#f2c5a0]", photo: PAISAJES.alsacia, items: ["sticker", "magnet"] },
+  { id: "festive", name: "Pack Celebración", kicker: "Para regalar", description: "Pegatina + bola de Navidad: un viaje que vuelve cada diciembre.", price: "30 €", color: "bg-[#d9d1bd]", photo: PAISAJES.navidad, items: ["sticker", "ornament"] },
+  { id: "wall", name: "Pack Pieza de ciudad", kicker: "El recuerdo que se queda", description: "Pegatina + imán + cuadro de pared con una pieza de la ciudad que fue.", price: "58 €", badge: "Nuevo", color: "bg-[#cbd8d1]", photo: PAISAJES.budapest, items: ["sticker", "magnet", "wall"], featured: true },
+  { id: "mundi", name: "Pack Memento Mundi", kicker: "Todo el ritual", description: "La colección completa: pegatina, llavero, imán, bola y cuadro de ciudad.", price: "84 €", badge: "Completo", color: "bg-[#fa9223]", photo: PAISAJES.rialto, items: ["sticker", "keyring", "magnet", "ornament", "wall"], featured: true },
+];
+
+function StoreHeader({ onLogin, loggedIn }: { onLogin: () => void; loggedIn: boolean }) {
+  return (
+    <header className="flex items-center justify-end">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => document.getElementById("packs")?.scrollIntoView({ behavior: "smooth" })}
+          className="hidden sm:block rounded-full border-2 border-ink bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-wider hover:bg-orange transition-colors"
+        >
+          Packs
+        </button>
+        <button
+          type="button"
+          onClick={onLogin}
+          className="flex items-center gap-2 rounded-full border-2 border-ink bg-ink px-3.5 py-2 text-xs font-black uppercase tracking-wider text-cream hover:bg-orange hover:text-ink transition-colors shadow-hard-sm"
+        >
+          <span className="hidden sm:inline">{loggedIn ? "Mis scrapbooks" : "Entrar"}</span>
+          <UserRound size={16} />
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function PackCard({ pack, onAdd }: { pack: Pack; onAdd: (pack: Pack) => void }) {
+  return (
+    <article className={`group relative flex flex-col justify-between overflow-hidden rounded-[1.7rem] border-2 border-ink ${pack.color} p-3.5 shadow-hard transition-transform duration-200 hover:-translate-y-1`}>
+      <div>
+        <div className="relative aspect-[1.25/1] overflow-hidden rounded-[1.2rem] border-2 border-ink bg-ink">
+          <PaisajePhoto photo={pack.photo} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 100vw" decorative className="opacity-90 transition-transform duration-500 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" />
+          <div className="absolute left-3 right-3 top-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border-2 border-ink bg-cream px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">{pack.kicker}</span>
+            {pack.badge && <span className="rounded-full border-2 border-ink bg-orange px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">{pack.badge}</span>}
+          </div>
+          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-cream">
+            <div className="min-w-0">
+              <p className="font-display text-xl font-black leading-[1.04] break-words sm:text-2xl">{pack.name}</p>
+              <p className="mt-1 text-xs font-bold text-cream/70">{pack.price} · envío incluido</p>
+            </div>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-orange text-ink"><Package size={18} /></span>
+          </div>
+        </div>
+        <div className="px-1 pb-1 pt-4">
+          <p className="min-h-12 text-sm font-medium leading-relaxed text-ink/70">{pack.description}</p>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {pack.items.map((item) => (
+              <span key={item} className="rounded-full border-2 border-ink/60 bg-white/45 px-2 py-1 text-[10px] font-black uppercase tracking-wider">
+                {products[item as ProductKind].icon} {products[item as ProductKind].label.replace("NFC + QR", "")}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => onAdd(pack)}
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-ink px-4 py-3 text-sm font-black text-cream shadow-hard-sm transition-transform hover:-translate-y-0.5 hover:bg-orange hover:text-ink"
+      >
+        <ShoppingBag size={16} /> Añadir al kit <ArrowRight size={16} />
+      </button>
+    </article>
+  );
+}
+
+export default function StorePage() {
+  const { isAuthenticated, openLogin } = useAppAuth();
+  const [, setLocation] = useLocation();
+  const [cart, setCart] = useState<Pack[]>([]);
+  const [showCart, setShowCart] = useState(false);
+  const total = useMemo(() => cart.reduce((sum, item) => sum + Number(item.price.replace(" €", "")), 0), [cart]);
+
+  const handleLogin = () => isAuthenticated ? setLocation("/") : openLogin();
+  const addPack = (pack: Pack) => { setCart((current) => [...current, pack]); setShowCart(true); };
+
+  return (
+    <main className="relative min-h-screen overflow-x-hidden bg-[#EAE7DA] pb-32">
+      {/* Intro a pantalla completa: bloquea el scroll, el vídeo sigue al gesto y se funde al terminar */}
+      <StickerScrollHero />
+
+      {/* Contenido principal de la tienda (empieza arriba del todo cuando la intro se va) */}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pt-24 sm:px-8 sm:pt-28 lg:px-12">
+        <StoreHeader onLogin={handleLogin} loggedIn={isAuthenticated} />
+
+        <PageHero className="mt-8 sm:mt-10" photo={PAISAJES.navidad} eyebrow="Memento Mundi · tienda" title={<>Objetos para<br /><span className="text-orange">volver.</span></>} priority>
+          Pegatinas, llaveros e imanes para que cada viaje tenga su punto de partida.
+        </PageHero>
+
+        
+        {/* Pasos de uso */}
+        <section className="mt-10 grid gap-4 sm:grid-cols-3" id="how">
+          <div className="rounded-[1.4rem] border-2 border-ink bg-orange p-5 shadow-hard-sm">
+            <div className="flex items-start justify-between gap-3"><span className="font-mono text-3xl">01</span><Mascot name="28-pegatina-despegar" size="sm" /></div>
+            <h2 className="mt-6 font-display text-2xl font-black">Pega</h2>
+            <p className="mt-2 text-sm font-medium text-ink/75">Coloca tu pegatina en una postal, mochila o cuaderno de viaje.</p>
+          </div>
+          <div className="rounded-[1.4rem] border-2 border-ink bg-white/60 p-5 shadow-hard-sm">
+            <div className="flex items-start justify-between gap-3"><span className="font-mono text-3xl">02</span><Mascot name="13-escanear-qr" size="sm" /></div>
+            <h2 className="mt-6 font-display text-2xl font-black">Escanea</h2>
+            <p className="mt-2 text-sm font-medium text-ink/75">Abre Memento Mundi y desbloquea el scrapbook de esa coordenada.</p>
+          </div>
+          <div className="rounded-[1.4rem] border-2 border-ink bg-[#d8e2dc] p-5 shadow-hard-sm">
+            <div className="flex items-start justify-between gap-3"><span className="font-mono text-3xl">03</span><Mascot name="37-pegatina-avion" size="sm" /></div>
+            <h2 className="mt-6 font-display text-2xl font-black">Vuelve</h2>
+            <p className="mt-2 text-sm font-medium text-ink/75">Añade fotos, invita a tu gente y revive el viaje cuando quieras.</p>
+          </div>
+        </section>
+
+        {/* Sección de packs con Miriam acompañando el encabezado */}
+        <section className="mt-20" id="packs">
+          <div className="flex flex-col justify-between gap-6 border-b-2 border-ink/15 pb-6 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[.2em] text-orange">Colección física</p>
+              <h2 className="mt-2 break-words font-display text-4xl font-black leading-[1.04] tracking-[-.01em] sm:text-6xl">
+                Elige cómo<br /><span className="text-orange">quieres volver.</span>
+              </h2>
+              <p className="mt-4 max-w-md text-sm font-medium leading-relaxed text-ink/65">
+                Todos los packs incluyen al menos una pegatina NFC + QR. Combina objetos según tu tipo de viaje.
+              </p>
+            </div>
+            
+            {/* Miriam acompañando el texto grande */}
+            <div className="lg:max-w-md">
+              <CharacterGuide
+                character="miriam"
+                speech="Nosotros siempre llevamos el Pack Pegatinas en la mochila para cuando encontramos un rincón especial."
+                subtext="El chip NFC abre tu cuaderno digital al apoyar el móvil."
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {packs.map((pack) => <PackCard key={pack.id} pack={pack} onAdd={addPack} />)}
+          </div>
+        </section>
+
+        {/* Sección "La pieza que fue" con Arturo acompañando el texto */}
+        <section className="mt-20 overflow-hidden rounded-[2rem] border-2 border-ink bg-[#d8e2dc] p-6 shadow-hard sm:p-10">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_.9fr]">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[.2em] text-orange">La pieza que fue</p>
+              <h2 className="mt-3 max-w-xl font-display text-4xl sm:text-5xl font-black leading-[1.04] tracking-[-.01em] break-words">
+                Una ciudad también puede vivir en tu pared.
+              </h2>
+              <p className="mt-4 max-w-lg text-sm sm:text-base font-medium leading-relaxed text-ink/70">
+                El cuadro de pared convierte la pieza de la ciudad que visitaste en un objeto tangible con historia. Lisboa, Kyoto, Algarve o tu próxima parada.
+              </p>
+
+              {/* Arturo acompañando la sección */}
+              <div className="mt-6">
+                <CharacterGuide
+                  character="arturo"
+                  speech="El cuadro con la pieza de la ciudad que fue es mi rincón favorito de casa."
+                  subtext="Un recordatorio diario de los lugares donde fuiste feliz."
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => addPack(packs.find((pack) => pack.id === "wall")!)}
+                className="mt-7 flex items-center gap-2 rounded-xl border-2 border-ink bg-orange px-5 py-3.5 text-sm font-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:scale-95"
+              >
+                Descubrir el pack <ArrowRight size={17} />
+              </button>
+            </div>
+
+            <div className="relative mx-auto w-full max-w-sm rotate-[3deg] sm:rotate-[4deg] rounded-2xl border-2 border-ink bg-cream p-3 shadow-hard">
+<div className="aspect-[4/3] w-full overflow-hidden rounded-xl border-2 border-ink bg-ink"><PaisajePhoto photo={PAISAJES.alsacia} sizes="(min-width: 640px) 384px, 90vw" /></div>
+              <div className="absolute -bottom-3 -left-3 rotate-[-7deg] rounded-lg border-2 border-ink bg-orange px-3 py-1.5 font-mono text-[11px] font-black shadow-hard-sm">
+                LA CIUDAD QUE FUE
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Postales: muro decorativo de fotos */}
+        <section className="mt-20" aria-label="Postales del mundo">
+          <PhotoMosaic set="a" />
+        </section>
+
+        <footer className="mt-16 flex flex-col justify-between gap-4 border-t-2 border-ink/15 pt-6 text-xs font-bold text-ink/60 sm:flex-row pb-6">
+          <span>memento mundi · objetos para recordar mejor</span>
+          <span className="flex items-center gap-3"><Instagram size={15} /> Hecho para volver</span>
+        </footer>
+      </div>
+
+      {/* Modal flotante del carrito: queda por encima del dock, sin taparlo */}
+      {showCart && (
+        <div className="fixed bottom-[5.5rem] right-3 z-50 max-h-[calc(100dvh-7rem)] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-[1.5rem] border-2 border-ink bg-cream p-4 shadow-hard sm:bottom-28 sm:right-8">
+          <div className="flex items-center justify-between">
+            <Mascot name="09-carrito" size="sm" className="!w-16 shrink-0" />
+            <div className="min-w-0 flex-1 px-3">
+              <p className="text-[10px] font-black uppercase tracking-[.16em] text-orange">Tu kit</p>
+              <h2 className="font-display text-2xl font-black">{cart.length} pack{cart.length === 1 ? "" : "s"}</h2>
+            </div>
+            <button type="button" onClick={() => setShowCart(false)} aria-label="Cerrar kit" className="rounded-full border-2 border-ink bg-white/60 p-2"><X size={16} /></button>
+          </div>
+          <div className="mt-3 max-h-32 space-y-2 overflow-auto">
+            {cart.map((item, index) => (
+              <div key={`${item.id}-${index}`} className="flex items-center justify-between gap-3 border-b border-ink/15 pb-2 text-sm font-bold">
+                <span className="min-w-0 truncate">{item.name}</span>
+                <span className="shrink-0">{item.price}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t-2 border-ink pt-3 font-black">
+            <span>Total orientativo</span>
+            <span>{total} €</span>
+          </div>
+          <button type="button" onClick={handleLogin} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-orange px-4 py-3 text-sm font-black shadow-hard-sm">
+            {isAuthenticated ? "Continuar" : "Entrar para comprar"} <ArrowRight size={16} />
+          </button>
+        </div>
+      )}
+    </main>
+  );
+}
